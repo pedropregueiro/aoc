@@ -25,15 +25,8 @@ class Moves(Enum):
             return 0
 
 
-# this feels wrong...
-possible_moves = {
-    "A": Moves.Rock,
-    "B": Moves.Paper,
-    "C": Moves.Scissors,
-    "X": Moves.Rock,
-    "Y": Moves.Paper,
-    "Z": Moves.Scissors,
-}
+possible_moves = {"A": Moves.Rock, "B": Moves.Paper, "C": Moves.Scissors}
+possible_ends = {"X": 0, "Y": 3, "Z": 6}
 
 
 def calc_score(input_filename: str) -> int:
@@ -43,16 +36,20 @@ def calc_score(input_filename: str) -> int:
     total_score = 0
 
     for line in lines:
-        opp_move_str, should_move_str = line.strip().split(" ")
+        opp_move_str, expected_vs_score_str = line.strip().split(" ")
 
         opp_move = possible_moves[opp_move_str]
-        should_move = possible_moves[should_move_str]
+        expected_vs_score = possible_ends[expected_vs_score_str]
 
-        shape_score = should_move.value[1]
-        versus_score = should_move.versus(opp_move)
+        for chosen_move in Moves:
+            versus_score = chosen_move.versus(opp_move)
+            if versus_score == expected_vs_score:
+                break
+
+        shape_score = chosen_move.value[1]
         round_score = shape_score + versus_score
 
-        print(f"opponent played {opp_move} | should play: {should_move} | score: {round_score}")
+        print(f"opponent: {opp_move} | expected: {expected_vs_score} | play: {chosen_move} | score: {round_score}")
 
         total_score += round_score
 
@@ -60,6 +57,6 @@ def calc_score(input_filename: str) -> int:
 
 
 if __name__ == "__main__":
-    assert calc_score("test_input.txt") == 15
+    assert calc_score("test_input.txt") == 12
     score = calc_score("input.txt")
     print(f"Total score: {score}")
