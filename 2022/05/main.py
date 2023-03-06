@@ -60,6 +60,21 @@ def move_crates(stacks: List[deque], instr_line):
     return stacks
 
 
+def move_crates_9001(stacks: List[deque], instr_line):
+    qty_str, from_str, to_str = re.findall(r"move (\d+) from (\d+) to (\d+)", instr_line)[0]
+    qty = int(qty_str)
+    from_ = int(from_str) - 1
+    to_ = int(to_str) - 1
+
+    new_elems = []
+    for _ in range(qty):
+        new_elems.append(stacks[from_].popleft())
+
+    stacks[to_].extendleft(reversed(new_elems))
+
+    return stacks
+
+
 def get_top_crates(filename: str) -> str:
     with open(filename) as f:
         lines = f.read().splitlines()
@@ -70,7 +85,7 @@ def get_top_crates(filename: str) -> str:
 
     for instruction in instructions:
         print(f"\n# {instruction}")
-        stacks = move_crates(stacks, instruction)
+        stacks = move_crates_9001(stacks, instruction)
         _print_stacks(stacks)
 
     top_crates = "".join([d[0] for d in stacks])
@@ -80,5 +95,5 @@ def get_top_crates(filename: str) -> str:
 
 
 if __name__ == "__main__":
-    assert get_top_crates("test_input.txt") == "CMZ"
+    assert get_top_crates("test_input.txt") == "MCD"
     get_top_crates("input.txt")
